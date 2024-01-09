@@ -21,19 +21,15 @@ def start(message):
     bot.send_message(message.chat.id, "Пожалуйста зарегестрируйтесь командой \n /register")
     print("asd")
 
-@bot.message_handler(commands=['number'])
+@bot.message_handler(commands=['register'])
 def phone(message):
-
-    keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True) #Подключаем клавиатуру
-
-    button_phone = types.KeyboardButton(text="Отправить телефон", request_contact=True) #Указываем название кнопки, которая появится у пользователя
-
+    keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+    button_phone = types.KeyboardButton(text="Отправить телефон", request_contact=True)
     keyboard.add(button_phone) #Добавляем эту кнопку
-
     bot.send_message(message.chat.id, 'Номер телефона', reply_markup=keyboard)
 
 @bot.message_handler(content_types=['contact'])
-def register(message):
+def contact(message):
 
     if message.contact is not None:
         print(message.contact)
