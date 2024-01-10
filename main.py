@@ -1,10 +1,11 @@
 import telebot
 import json
-from telebot import types #Подключили дополнения
+from telebot import types
+from telebot.types import ReplyKeyboardRemove
 
 
 
-
+boss = [1376233184]
 
 with open("contacts", "r") as file:
     lines = file.read()
@@ -18,8 +19,12 @@ bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id, "Пожалуйста зарегестрируйтесь командой \n /register")
-    print("asd")
+    print(message)
+    if message.from_user.id in boss:
+            bot.send_message(message.chat.id, 'Привет')
+    else:
+        bot.send_message(message.chat.id, "Пожалуйста зарегестрируйтесь командой \n /register")
+        print("asd")
 
 @bot.message_handler(commands=['register'])
 def phone(message):
@@ -34,8 +39,11 @@ def contact(message):
     if message.contact is not None:
         print(message.contact)
         print(message.contact.first_name, message.contact.last_name, message.contact.user_id)
-        contacts[message.contact.phone_number] = {'first_name': message.contact.first_name, 'last_name': message.contact.last_name, 'user_id': message.contact.user_id, "date": message.json["date"]    }
-        bot.send_message(message.chat.id, "Thanks you for your phone number \n /start")
+        try:
+            print(contacts[message.contact.phone_number])
+        except:
+            contacts[message.contact.phone_number] = {'first_name': message.contact.first_name, 'last_name': message.contact.last_name, 'user_id': message.contact.user_id, "date": message.json["date"]    }
+        bot.send_message(message.chat.id, "Thanks you for your phone number \n /start", reply_markup=ReplyKeyboardRemove())
 
         with open("contacts", "w") as file:
             file.write(str(contacts))
