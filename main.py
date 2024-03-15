@@ -68,7 +68,7 @@ def menu(message):
     btn1 = types.KeyboardButton("Активный пароль")
     btn2 = types.KeyboardButton("Выйти из профиля")
     markup.add(btn1, btn2)
-    bot.send_message(message.chat.id, text="Привет! Я тестовый бот ", reply_markup=markup)
+    bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
 
 @bot.message_handler(content_types=['text'])
 def func(message):
@@ -88,7 +88,10 @@ def func(message):
         for i in list(contacts.keys()):
             if contacts[i]['user_id'] == message.chat.id:
                 contacts_number = i
-        contacts.pop(contacts_number)
+        try:
+            contacts.pop(contacts_number)
+        except:
+            print("Something went wrong")
         bot.send_message(message.chat.id, "Вы успешно вышли", reply_markup=ReplyKeyboardRemove())
         bot.send_message(message.chat.id, "Для дальнейших действий оправьте /start")
         with open("contacts", "w") as file:
