@@ -82,7 +82,17 @@ def func(message):
         #######
         ########            ВЫСЫЛАЕМ АКТИВНЫЙ ПАРОЛЬ
         password = 'active_password'
-        bot.send_message(message.chat.id, text=f"```{password}```")
+        bot.send_message(message.chat.id, text=f"`active_password`", parse_mode='MarkdownV2')
+    elif message.text == "Выйти из профиля":
+        contacts_number = False
+        for i in list(contacts.keys()):
+            if contacts[i]['user_id'] == message.chat.id:
+                contacts_number = i
+        contacts.pop(contacts_number)
+        bot.send_message(message.chat.id, "Вы успешно вышли", reply_markup=ReplyKeyboardRemove())
+        bot.send_message(message.chat.id, "Для дальнейших действий оправьте /start")
+        with open("contacts", "w") as file:
+            file.write(str(contacts))
 
 
 
