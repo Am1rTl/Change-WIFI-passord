@@ -5,9 +5,13 @@ from telebot.types import ReplyKeyboardRemove
 
 
 
-boss = [1376233184]
 trusted_chats = []
 queue = []
+
+with open("boss", "r") as file:
+    lines = file.read()
+
+boss = eval(lines)
 
 with open("contacts", "r") as file:
     lines = file.read()
