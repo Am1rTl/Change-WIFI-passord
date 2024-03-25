@@ -4,6 +4,13 @@ from telebot import types
 from telebot.types import ReplyKeyboardRemove
 
 
+global get_pattern
+get_pattern = 0
+global password_pattern
+
+password_pattern = ''
+with open("password_pattern", "r") as file:
+    password_pattern = file.read()
 
 trusted_chats = []
 queue = []
@@ -87,6 +94,17 @@ def contact(message):
 def info(message):
     bot.send_message(message.chat.id, str(contacts))
 
+@bot.message_handler(commands=['admin_menu'])
+def admin_menu(message):
+    if message.chat.id in boss:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        btn1 = types.KeyboardButton("Задать маску пароля")
+        btn2 = types.KeyboardButton("Задать время смены пароля")
+        markup.add(btn1, btn2)
+        bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
+    else:
+        bot.send_message(message.chat.id, "У тебя недостаточно прав для этого")
+
 
 @bot.message_handler(commands=['menu'])
 def menu(message):
@@ -98,15 +116,6 @@ def menu(message):
         bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
     else:
         bot.send_message(message.chat.id, text="Пожалуйста зарегестрируйтесь\n/register")
-
-@bot.message_handler(commands=['asd'])
-def start(message):
-    markup = types.InlineKeyboardMarkup()
-    button1 = types.InlineKeyboardButton('Да', callback_data='yes')
-    button2 = types.InlineKeyboardButton('Нет', callback_data='no')
-    markup.add(button1)
-    markup.add(button2)
-    bot.send_message(message.chat.id, 'Привет! Нажми кнопку:', reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
@@ -131,6 +140,8 @@ def callback_query(call):
 
 @bot.message_handler(content_types=['text'])
 def func(message):
+    global password_pattern
+    global get_pattern
     if message.chat.id in trusted_chats:
         if(message.text == "Активный пароль"):
             #
@@ -156,6 +167,20 @@ def func(message):
             bot.send_message(message.chat.id, "Для дальнейших действий оправьте /start")
             with open("contacts", "w") as file:
                 file.write(str(contacts))
+
+        if message.chat.id in boss:
+            if message.text == "Задать маску пароля":
+                bot.send_message(message.chat.id, "Пожалуйста введите стоку, с которой будет начинаться пароль", reply_markup=ReplyKeyboardRemove())
+                get_pattern = 1
+            elif get_pattern == 1:
+                password_pattern = message.text
+                get_pattern = 0
+
+                with open("password_pattern", "w") as file:
+                    file.write(password_pattern)
+                start(message)
+
+
     else:
         bot.send_message(message.chat.id, text="Пожалуйста зарегестрируйтесь\n/register")
 
