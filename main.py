@@ -13,6 +13,11 @@ with open("contacts", "r") as file:
     lines = file.read()
 
 contacts = eval(lines)
+
+with open("trust", "r") as file:
+    lines = file.read()
+
+trusted_chats = eval(lines)
 #contacts = {}
 
 with open("token", "r") as file:
@@ -81,11 +86,14 @@ def info(message):
 
 @bot.message_handler(commands=['menu'])
 def menu(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    btn1 = types.KeyboardButton("Активный пароль")
-    btn2 = types.KeyboardButton("Выйти из профиля")
-    markup.add(btn1, btn2)
-    bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
+    if message.chat.id in trusted_chats:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        btn1 = types.KeyboardButton("Активный пароль")
+        btn2 = types.KeyboardButton("Выйти из профиля")
+        markup.add(btn1, btn2)
+        bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
+    else:
+        bot.send_message(message.chat.id, text="Пожалуйста зарегестрируйтесь\n/register")
 
 @bot.message_handler(commands=['asd'])
 def start(message):
@@ -111,39 +119,41 @@ def callback_query(call):
         bot.send_message(boss[0], 'Заявка на регестрацию отклонена')
 
     print(trusted_chats)
-    if call.data == 'yes':
-        bot.send_message(call.message.chat.id, 'Yeeea Джон Сина')
-    elif call.data == 'no':
-        bot.send_message(call.message.chat.id, 'Oh no no no no ...')
+
+    with open("trust", "w") as file:
+            file.write(str(trusted_chats))
 
 
 
 @bot.message_handler(content_types=['text'])
 def func(message):
-    if(message.text == "Активный пароль"):
-        #
-        ##
-        ###
-        ####
-        #####
-        ######
-        #######
-        ########            ВЫСЫЛАЕМ АКТИВНЫЙ ПАРОЛЬ
-        password = 'active_password'
-        bot.send_message(message.chat.id, text=f"`active_password`", parse_mode='MarkdownV2')
-    elif message.text == "Выйти из профиля":
-        contacts_number = False
-        for i in list(contacts.keys()):
-            if contacts[i]['user_id'] == message.chat.id:
-                contacts_number = i
-        try:
-            contacts.pop(contacts_number)
-        except:
-            print("Something went wrong")
-        bot.send_message(message.chat.id, "Вы успешно вышли", reply_markup=ReplyKeyboardRemove())
-        bot.send_message(message.chat.id, "Для дальнейших действий оправьте /start")
-        with open("contacts", "w") as file:
-            file.write(str(contacts))
+    if message.chat.id in trusted_chats:
+        if(message.text == "Активный пароль"):
+            #
+            ##
+            ###
+            ####
+            #####
+            ######
+            #######
+            ########            ВЫСЫЛАЕМ АКТИВНЫЙ ПАРОЛЬ
+            password = 'active_password'
+            bot.send_message(message.chat.id, text=f"`active_password`", parse_mode='MarkdownV2')
+        elif message.text == "Выйти из профиля":
+            contacts_number = False
+            for i in list(contacts.keys()):
+                if contacts[i]['user_id'] == message.chat.id:
+                    contacts_number = i
+            try:
+                contacts.pop(contacts_number)
+            except:
+                print("Something went wrong")
+            bot.send_message(message.chat.id, "Вы успешно вышли", reply_markup=ReplyKeyboardRemove())
+            bot.send_message(message.chat.id, "Для дальнейших действий оправьте /start")
+            with open("contacts", "w") as file:
+                file.write(str(contacts))
+    else:
+        bot.send_message(message.chat.id, text="Пожалуйста зарегестрируйтесь\n/register")
 
 
 
