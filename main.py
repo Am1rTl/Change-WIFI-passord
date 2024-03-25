@@ -6,6 +6,8 @@ from telebot.types import ReplyKeyboardRemove
 
 
 boss = [1376233184]
+trusted_chats = []
+queue = []
 
 with open("contacts", "r") as file:
     lines = file.read()
@@ -45,17 +47,32 @@ def phone(message):
 def contact(message):
 
     if message.contact is not None:
-        print(message.contact)
-        print(message.contact.first_name, message.contact.last_name, message.contact.user_id)
+        #print(message.contact)
+        #print(message.contact.first_name, message.contact.last_name, message.contact.user_id)
         try:
             print(contacts[message.contact.phone_number])
         except:
             print({'first_name': message.contact.first_name, 'last_name': message.contact.last_name, 'user_id': message.contact.user_id, "date": message.json["date"]    })
             contacts[message.contact.phone_number] = {'first_name': message.contact.first_name, 'last_name': message.contact.last_name, 'user_id': message.contact.user_id, "date": message.json["date"]    }
-        bot.send_message(message.chat.id, "Thanks you for your phone number \n /start", reply_markup=ReplyKeyboardRemove())
+
+        queue.append(message.chat.id)
+
+
+        markup = types.InlineKeyboardMarkup()
+        button1 = types.InlineKeyboardButton('Да', callback_data=str(message.chat.id))
+        button2 = types.InlineKeyboardButton('Нет', callback_data=str(message.chat.id)+'a')
+        markup.add(button1)
+        markup.add(button2)
+        if message.from_user.last_name != None:
+            bot.send_message(boss[0], text=f"Регестрация нового пользователя c: \nИменем: `{message.from_user.first_name} {message.from_user.last_name}`\nНиком: `{message.from_user.username}` \nТелефоном: `{message.contact.phone_number}` ", parse_mode='MarkdownV2', reply_markup=markup)
+        else:
+            bot.send_message(boss[0], text=f"Регестрация нового пользователя c: \nИменем: `{message.from_user.first_name}`\nНиком: `{message.from_user.username}` \nТелефоном: `{message.contact.phone_number}` ", parse_mode='MarkdownV2', reply_markup=markup)
+
 
         with open("contacts", "w") as file:
             file.write(str(contacts))
+
+        bot.send_message(message.chat.id, "Thanks you for your phone number \n /start", reply_markup=ReplyKeyboardRemove())
 
 @bot.message_handler(commands=['info'])
 def info(message):
@@ -69,6 +86,37 @@ def menu(message):
     btn2 = types.KeyboardButton("Выйти из профиля")
     markup.add(btn1, btn2)
     bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
+
+@bot.message_handler(commands=['asd'])
+def start(message):
+    markup = types.InlineKeyboardMarkup()
+    button1 = types.InlineKeyboardButton('Да', callback_data='yes')
+    button2 = types.InlineKeyboardButton('Нет', callback_data='no')
+    markup.add(button1)
+    markup.add(button2)
+    bot.send_message(message.chat.id, 'Привет! Нажми кнопку:', reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    try:
+        bot.send_message(int(call.data), 'Ваша заявка на регестрацию одобрена')
+        bot.send_message(boss[0], 'Заявка на регестрацию одобрена')
+        trusted_chats.append(int(call.data))
+    except:
+        try:
+            trusted_chats.pop(trusted_chats.index(int(call.data[:-1])))
+        except:
+            pass
+        bot.send_message(int(call.data[:-1]), 'Ваша заявка на регестрацию отклонена')
+        bot.send_message(boss[0], 'Заявка на регестрацию отклонена')
+
+    print(trusted_chats)
+    if call.data == 'yes':
+        bot.send_message(call.message.chat.id, 'Yeeea Джон Сина')
+    elif call.data == 'no':
+        bot.send_message(call.message.chat.id, 'Oh no no no no ...')
+
+
 
 @bot.message_handler(content_types=['text'])
 def func(message):
