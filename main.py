@@ -7,6 +7,10 @@ from telebot.types import ReplyKeyboardRemove
 global get_pattern
 get_pattern = 0
 global password_pattern
+global set_time
+set_time = 0
+global times
+times = 0
 
 password_pattern = ''
 with open("password_pattern", "r") as file:
@@ -142,6 +146,8 @@ def callback_query(call):
 def func(message):
     global password_pattern
     global get_pattern
+    global set_time
+
     if message.chat.id in trusted_chats:
         if(message.text == "Активный пароль"):
             #
@@ -173,7 +179,7 @@ def func(message):
 
         if message.chat.id in boss:
             if message.text == "Задать маску пароля":
-                bot.send_message(message.chat.id, "Пожалуйста введите стоку, с которой будет начинаться пароль", reply_markup=ReplyKeyboardRemove())
+                bot.send_message(message.chat.id, "Пожалуйста введите все символы, которые могут содержаться в пароле.", reply_markup=ReplyKeyboardRemove())
                 get_pattern = 1
             elif get_pattern == 1:
                 password_pattern = message.text
@@ -181,7 +187,22 @@ def func(message):
 
                 with open("password_pattern", "w") as file:
                     file.write(password_pattern)
+                bot.send_message(message.chat.id, text="Маска пароля успешно создана. При следуюшем создании пароля она будет учтена.")
                 start(message)
+            elif message.text == "Задать время смены пароля":
+                bot.send_message(message.chat.id, "Напишите время, через которое будет сменяться пароль в МИНУТАХ.")
+                set_time = 1
+            elif set_time == 1:
+                try:
+                    times = int(message.text)
+                    bot.send_message(message.chat.id, f"Новое время смены пароля установлено.\nПароль обновится через: {times//60} ч. {times%60} мин.")
+                    set_time = 0
+                    start(message)
+                except:
+                    bot.send_message(message.chat.id, "Время указано неверно\nПопробуйте заново.")
+
+
+
 
 
     else:
