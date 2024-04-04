@@ -45,7 +45,7 @@ def start(message):
             has_person_in_contacts = True
 
     if message.from_user.id in boss:
-        bot.send_message(message.chat.id, 'Привет босс, чтобы открыть меню админитратора отправь \n /admin_menu \n А чтобы открыть обычное меню открой \n /menu')
+        bot.send_message(message.chat.id, 'Привет администратор, чтобы открыть меню управлния отправь \n /admin_menu \n А чтобы открыть обычное меню открой \n /menu')
     elif has_person_in_contacts == True:
         bot.send_message(message.chat.id, 'Привет, чтобы открыть меню нажми команду \n /menu')
     else:
@@ -152,8 +152,11 @@ def func(message):
             ######
             #######
             ########            ВЫСЫЛАЕМ АКТИВНЫЙ ПАРОЛЬ
-            password = 'active_password'
-            bot.send_message(message.chat.id, text=f"`active_password`", parse_mode='MarkdownV2')
+            with open("password", 'r') as f:
+                password = f.read()
+            #password = 'active_password'
+            bot.send_message(message.chat.id, text=f"`{password}`", parse_mode='MarkdownV2')
+            f.close()
         elif message.text == "Выйти из профиля":
             contacts_number = False
             for i in list(contacts.keys()):
