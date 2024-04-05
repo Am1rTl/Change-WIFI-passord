@@ -4,17 +4,18 @@ from telebot import types
 from telebot.types import ReplyKeyboardRemove
 
 
-global get_pattern
-get_pattern = 0
-global password_pattern
+global get_alphabet
+get_alphabet = 0
+global password_alphabet
 global set_time
 set_time = 0
 global times
 times = 0
 
-password_pattern = ''
-with open("password_pattern", "r") as file:
-    password_pattern = file.read()
+
+password_alphabet = ''
+with open("password_alphabet", "r") as file:
+    password_alphabet = file.read()
 
 trusted_chats = []
 queue = []
@@ -144,8 +145,8 @@ def callback_query(call):
 
 @bot.message_handler(content_types=['text'])
 def func(message):
-    global password_pattern
-    global get_pattern
+    global password_alphabet
+    global get_alphabet
     global set_time
 
     if message.chat.id in trusted_chats:
@@ -188,20 +189,38 @@ def func(message):
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
                 btn1 = types.KeyboardButton("Заглавные буквы")
                 btn2 = types.KeyboardButton("Маленькие буквы")
-                btn1 = types.KeyboardButton("Цыфры")
-                btn1 = types.KeyboardButton("Цифры и маленькие буквы")
-                btn1 = types.KeyboardButton("Цифры и заглавные буквы")
-                markup.add(btn1, btn2)
+                btn3 = types.KeyboardButton("Все буквы")
+                btn4 = types.KeyboardButton("Цифры")
+                btn5 = types.KeyboardButton("Цифры и маленькие буквы")
+                btn6 = types.KeyboardButton("Цифры и заглавные буквы")
+                btn7 = types.KeyboardButton("Цифры и все буквы")
+                markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7)
                 bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
                 bot.send_message(message.chat.id, "Пожалуйста введите все символы, которые могут содержаться в пароле.", reply_markup=ReplyKeyboardRemove())
-                get_pattern = 1
-            elif get_pattern == 1:
-                password_pattern = message.text
-                get_pattern = 0
+                get_alphabet = 1
+            elif get_alphabet == 1:
+                password_alphabet = message.text
+                get_alphabet = 0
 
-                with open("password_pattern", "w") as file:
-                    file.write(password_pattern)
-                bot.send_message(message.chat.id, text="Маска пароля успешно создана. При следуюшем создании пароля она будет учтена.")
+                if message.text == "Заглавные буквы":
+                    password_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                elif message.text == "Маленькие буквы":
+                    password_alphabet = "abcdefghijklmnopqrstuvwxyz"
+                elif message.text == "Все буквы":
+                    password_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                elif message.text == "Цифры"
+                    password_alphabet == "0123456789"
+                elif message.text == "Цифры и маленькие буквы":
+                    password_alphabet == "0123456789abcdefghijklmnopqrstuvwxyz"
+                elif message.text == "Цифры и заглавные буквы"
+                    password_alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                elif message.text == "Цифры и все буквы":
+                    password_alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+                with open("password_alphabet", "w") as file:
+                    file.write(password_alphabet)
+
+                bot.send_message(message.chat.id, text="Алфавит пароля успешно создан. При следуюшем создании пароля он будет учтен.")
                 start(message)
             elif message.text == "Задать время смены пароля":
                 bot.send_message(message.chat.id, "Напишите время, через которое будет сменяться пароль в МИНУТАХ.", reply_markup=ReplyKeyboardRemove() )
