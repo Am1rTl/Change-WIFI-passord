@@ -208,11 +208,11 @@ def func(message):
                     password_alphabet = "abcdefghijklmnopqrstuvwxyz"
                 elif message.text == "Все буквы":
                     password_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                elif message.text == "Цифры"
+                elif message.text == "Цифры":
                     password_alphabet == "0123456789"
                 elif message.text == "Цифры и маленькие буквы":
                     password_alphabet == "0123456789abcdefghijklmnopqrstuvwxyz"
-                elif message.text == "Цифры и заглавные буквы"
+                elif message.text == "Цифры и заглавные буквы":
                     password_alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 elif message.text == "Цифры и все буквы":
                     password_alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -222,6 +222,7 @@ def func(message):
 
                 bot.send_message(message.chat.id, text="Алфавит пароля успешно создан. При следуюшем создании пароля он будет учтен.")
                 start(message)
+
             elif message.text == "Задать время смены пароля":
                 bot.send_message(message.chat.id, "Напишите время, через которое будет сменяться пароль в МИНУТАХ.", reply_markup=ReplyKeyboardRemove() )
                 set_time = 1
