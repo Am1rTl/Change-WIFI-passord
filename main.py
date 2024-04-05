@@ -196,7 +196,7 @@ def func(message):
                 btn7 = types.KeyboardButton("Цифры и все буквы")
                 markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7)
                 bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
-                bot.send_message(message.chat.id, "Пожалуйста введите все символы, которые могут содержаться в пароле.", reply_markup=ReplyKeyboardRemove())
+                bot.send_message(message.chat.id, "Пожалуйста введите все символы, которые могут содержаться в пароле.")
                 get_alphabet = 1
             elif get_alphabet == 1:
                 password_alphabet = message.text
