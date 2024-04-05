@@ -199,7 +199,6 @@ def func(message):
                 bot.send_message(message.chat.id, "Пожалуйста введите все символы, которые могут содержаться в пароле.")
                 get_alphabet = 1
             elif get_alphabet == 1:
-                password_alphabet = message.text
                 get_alphabet = 0
 
                 if message.text == "Заглавные буквы":
@@ -216,15 +215,21 @@ def func(message):
                     password_alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 elif message.text == "Цифры и все буквы":
                     password_alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                else:
+                    get_alphabet = -1
+                    print("Я ничего не понял")
 
-                with open("password_alphabet", "w") as file:
-                    file.write(password_alphabet)
+                if get_alphabet != -1:
+                    with open("password_alphabet", "w") as file:
+                        file.write(password_alphabet)
 
-                bot.send_message(message.chat.id, text="Алфавит пароля успешно создан. При следуюшем создании пароля он будет учтен.")
-                start(message)
+                    bot.send_message(message.chat.id, text="Алфавит пароля успешно создан. При следуюшем создании пароля он будет учтен.", reply_markup=ReplyKeyboardRemove())
+                    start(message)
+                else:
+                    bot.send_message(message.chat.id, "Извините, я ничего не понял\n/start", reply_markup=ReplyKeyboardRemove())
 
             elif message.text == "Задать время смены пароля":
-                bot.send_message(message.chat.id, "Напишите время, через которое будет сменяться пароль в МИНУТАХ.", reply_markup=ReplyKeyboardRemove() )
+                bot.send_message(message.chat.id, "Напишите время, через которое будет сменяться пароль в МИНУТАХ.", reply_markup=ReplyKeyboardRemove())
                 set_time = 1
             elif set_time == 1:
                 try:
