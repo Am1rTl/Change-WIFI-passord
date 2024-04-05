@@ -11,6 +11,8 @@ global set_time
 set_time = 0
 global times
 times = 0
+global action
+action = 0
 
 
 password_alphabet = ''
@@ -148,6 +150,8 @@ def func(message):
     global password_alphabet
     global get_alphabet
     global set_time
+    global action
+    action = 1
 
     if message.chat.id in trusted_chats:
         if(message.text == "Активный пароль"):
@@ -164,6 +168,7 @@ def func(message):
             #password = 'active_password'
             bot.send_message(message.chat.id, text=f"`{password}`", parse_mode='MarkdownV2')
             f.close()
+            action = 1
         elif message.text == "Отключить уведомления":
             contacts_number = False
             for i in list(contacts.keys()):
@@ -184,65 +189,68 @@ def func(message):
             with open("contacts", "w") as file:
                 file.write(str(contacts))
 
-        if message.chat.id in boss:
-            if message.text == "Задать алфавит пароля":
-                markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-                btn1 = types.KeyboardButton("Заглавные буквы")
-                btn2 = types.KeyboardButton("Маленькие буквы")
-                btn3 = types.KeyboardButton("Все буквы")
-                btn4 = types.KeyboardButton("Цифры")
-                btn5 = types.KeyboardButton("Цифры и маленькие буквы")
-                btn6 = types.KeyboardButton("Цифры и заглавные буквы")
-                btn7 = types.KeyboardButton("Цифры и все буквы")
-                markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7)
-                bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
-                bot.send_message(message.chat.id, "Пожалуйста введите все символы, которые могут содержаться в пароле.")
-                get_alphabet = 1
-            elif get_alphabet == 1:
-                get_alphabet = 0
+            action = 0
 
-                if message.text == "Заглавные буквы":
-                    password_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                elif message.text == "Маленькие буквы":
-                    password_alphabet = "abcdefghijklmnopqrstuvwxyz"
-                elif message.text == "Все буквы":
-                    password_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                elif message.text == "Цифры":
-                    password_alphabet == "0123456789"
-                elif message.text == "Цифры и маленькие буквы":
-                    password_alphabet == "0123456789abcdefghijklmnopqrstuvwxyz"
-                elif message.text == "Цифры и заглавные буквы":
-                    password_alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                elif message.text == "Цифры и все буквы":
-                    password_alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        if action == 1:
+            if message.chat.id in boss:
+                if message.text == "Задать алфавит пароля":
+                    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+                    btn1 = types.KeyboardButton("Заглавные буквы")
+                    btn2 = types.KeyboardButton("Маленькие буквы")
+                    btn3 = types.KeyboardButton("Все буквы")
+                    btn4 = types.KeyboardButton("Цифры")
+                    btn5 = types.KeyboardButton("Цифры и маленькие буквы")
+                    btn6 = types.KeyboardButton("Цифры и заглавные буквы")
+                    btn7 = types.KeyboardButton("Цифры и все буквы")
+                    markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7)
+                    bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
+                    bot.send_message(message.chat.id, "Пожалуйста введите все символы, которые могут содержаться в пароле.")
+                    get_alphabet = 1
+                elif get_alphabet == 1:
+                    get_alphabet = 0
+
+                    if message.text == "Заглавные буквы":
+                        password_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    elif message.text == "Маленькие буквы":
+                        password_alphabet = "abcdefghijklmnopqrstuvwxyz"
+                    elif message.text == "Все буквы":
+                        password_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    elif message.text == "Цифры":
+                        password_alphabet == "0123456789"
+                    elif message.text == "Цифры и маленькие буквы":
+                        password_alphabet == "0123456789abcdefghijklmnopqrstuvwxyz"
+                    elif message.text == "Цифры и заглавные буквы":
+                        password_alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    elif message.text == "Цифры и все буквы":
+                        password_alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    else:
+                        get_alphabet = -1
+                        print("Я ничего не понял")
+
+                    if get_alphabet != -1:
+                        with open("password_alphabet", "w") as file:
+                            file.write(password_alphabet)
+
+                        bot.send_message(message.chat.id, text="Алфавит пароля успешно создан. При следуюшем создании пароля он будет учтен.", reply_markup=ReplyKeyboardRemove())
+                        start(message)
+                    else:
+                        bot.send_message(message.chat.id, "Извините, я ничего не понял\n/start", reply_markup=ReplyKeyboardRemove())
+
+                elif message.text == "Задать время смены пароля":
+                    bot.send_message(message.chat.id, "Напишите время, через которое будет сменяться пароль в МИНУТАХ.", reply_markup=ReplyKeyboardRemove())
+                    set_time = 1
+                elif set_time == 1:
+                    try:
+                        times = int(message.text)
+                        bot.send_message(message.chat.id, f"Новое время смены пароля установлено.\nПароль обновится через: {times//60} ч. {times%60} мин.")
+                        set_time = 0
+                        start(message)
+                    except:
+                        bot.send_message(message.chat.id, "Время указано неверно\nПопробуйте заново.")
                 else:
-                    get_alphabet = -1
-                    print("Я ничего не понял")
-
-                if get_alphabet != -1:
-                    with open("password_alphabet", "w") as file:
-                        file.write(password_alphabet)
-
-                    bot.send_message(message.chat.id, text="Алфавит пароля успешно создан. При следуюшем создании пароля он будет учтен.", reply_markup=ReplyKeyboardRemove())
-                    start(message)
-                else:
-                    bot.send_message(message.chat.id, "Извините, я ничего не понял\n/start", reply_markup=ReplyKeyboardRemove())
-
-            elif message.text == "Задать время смены пароля":
-                bot.send_message(message.chat.id, "Напишите время, через которое будет сменяться пароль в МИНУТАХ.", reply_markup=ReplyKeyboardRemove())
-                set_time = 1
-            elif set_time == 1:
-                try:
-                    times = int(message.text)
-                    bot.send_message(message.chat.id, f"Новое время смены пароля установлено.\nПароль обновится через: {times//60} ч. {times%60} мин.")
-                    set_time = 0
-                    start(message)
-                except:
-                    bot.send_message(message.chat.id, "Время указано неверно\nПопробуйте заново.")
+                    bot.send_message(message.chat.id, "Извините, я не понимаю. Для меню нажмите на /start")
             else:
                 bot.send_message(message.chat.id, "Извините, я не понимаю. Для меню нажмите на /start")
-        else:
-            bot.send_message(message.chat.id, "Извините, я не понимаю. Для меню нажмите на /start")
 
 
 
