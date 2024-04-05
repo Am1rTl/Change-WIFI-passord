@@ -102,7 +102,7 @@ def info(message):
 def admin_menu(message):
     if message.chat.id in boss:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        btn1 = types.KeyboardButton("Задать маску пароля")
+        btn1 = types.KeyboardButton("Задать алфавит пароля")
         btn2 = types.KeyboardButton("Задать время смены пароля")
         markup.add(btn1, btn2)
         bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
@@ -163,7 +163,7 @@ def func(message):
             #password = 'active_password'
             bot.send_message(message.chat.id, text=f"`{password}`", parse_mode='MarkdownV2')
             f.close()
-        elif message.text == "Выйти из профиля":
+        elif message.text == "Отключить уведомления":
             contacts_number = False
             for i in list(contacts.keys()):
                 if contacts[i]['user_id'] == message.chat.id:
@@ -172,13 +172,27 @@ def func(message):
                 contacts.pop(contacts_number)
             except:
                 print("Something went wrong")
-            bot.send_message(message.chat.id, "Вы успешно вышли", reply_markup=ReplyKeyboardRemove())
+
+            try:
+                trust.pop(index(message.chat.id))
+            except:
+                pass
+
+            bot.send_message(message.chat.id, "Вы успешно отключили уведомления", reply_markup=ReplyKeyboardRemove())
             bot.send_message(message.chat.id, "Для дальнейших действий оправьте /start")
             with open("contacts", "w") as file:
                 file.write(str(contacts))
 
         if message.chat.id in boss:
-            if message.text == "Задать маску пароля":
+            if message.text == "Задать алфавит пароля":
+                markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+                btn1 = types.KeyboardButton("Заглавные буквы")
+                btn2 = types.KeyboardButton("Маленькие буквы")
+                btn1 = types.KeyboardButton("Цыфры")
+                btn1 = types.KeyboardButton("Цифры и маленькие буквы")
+                btn1 = types.KeyboardButton("Цифры и заглавные буквы")
+                markup.add(btn1, btn2)
+                bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
                 bot.send_message(message.chat.id, "Пожалуйста введите все символы, которые могут содержаться в пароле.", reply_markup=ReplyKeyboardRemove())
                 get_pattern = 1
             elif get_pattern == 1:
@@ -190,7 +204,7 @@ def func(message):
                 bot.send_message(message.chat.id, text="Маска пароля успешно создана. При следуюшем создании пароля она будет учтена.")
                 start(message)
             elif message.text == "Задать время смены пароля":
-                bot.send_message(message.chat.id, "Напишите время, через которое будет сменяться пароль в МИНУТАХ.")
+                bot.send_message(message.chat.id, "Напишите время, через которое будет сменяться пароль в МИНУТАХ.", reply_markup=ReplyKeyboardRemove() )
                 set_time = 1
             elif set_time == 1:
                 try:
@@ -200,8 +214,10 @@ def func(message):
                     start(message)
                 except:
                     bot.send_message(message.chat.id, "Время указано неверно\nПопробуйте заново.")
-
-
+            else:
+                bot.send_message(message.chat.id, "Извините, я не понимаю. Для меню нажмите на /start")
+        else:
+            bot.send_message(message.chat.id, "Извините, я не понимаю. Для меню нажмите на /start")
 
 
 
