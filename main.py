@@ -118,7 +118,7 @@ def menu(message):
     if message.chat.id in trusted_chats:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         btn1 = types.KeyboardButton("Активный пароль")
-        btn2 = types.KeyboardButton("Выйти из профиля")
+        btn2 = types.KeyboardButton("Отключить уведомления")
         markup.add(btn1, btn2)
         bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
     else:
