@@ -1,18 +1,83 @@
-import telebot
 import json
+import time
+import random
+import telebot
+import multiprocessing
+
 from telebot import types
 from telebot.types import ReplyKeyboardRemove
 
-
+global send_password_by_time
 global get_alphabet
 get_alphabet = 0
 global password_alphabet
 global set_time
 set_time = 0
-global times
-times = 0
 global action
 action = 0
+global proc
+global bot
+
+
+with open("token", "r") as file:
+    token = file.read()[:-1]
+bot = telebot.TeleBot(token)
+
+def restart_thread():
+    global proc
+    proc.terminate()
+    proc = multiprocessing.Process(target=send_password_by_time, args=())
+    proc.start()
+
+def bot_send_mess(i,password):
+    global bot
+    bot.send_message(i, text=f"`{password}`", parse_mode='MarkdownV2')
+
+
+def send_password_by_time():
+    global bot
+    print("Start thread")
+    while True:
+        with open("time", 'r') as f:
+            times = int(f.read())
+
+        with open("password_alphabet", 'r') as f:
+            password_alphabet = f.read()
+
+        with open("trust", "r") as file:
+            lines = file.read()
+        trusted_chats = eval(lines)
+
+        random.seed(time.time())
+        if times <= 60 :                                                # It`s about one hour
+            password = ''.join(random.choices(password_alphabet, k=7))
+        elif times > 60 and times <= 1440:                              # It`s about one day
+            password = ''.join(random.choices(password_alphabet, k=8))
+        elif times > 1440 and times <= 4320:                            # It`s about three days
+            password = ''.join(random.choices(password_alphabet, k=9))
+        elif times > 4320  and times <= 129600:                         # It`s about seven mounth
+            password = ''.join(random.choices(password_alphabet, k=10))
+        else:                                                           # For crack this password you need 41 years
+            password = ''.join(random.choices(password_alphabet, k=11))
+
+        with open("password", 'w') as f:
+            f.write(password)
+        f.close()
+
+        print("The password is:", password)
+        for i in trusted_chats:
+            bot_send_mess(i, password)
+
+        time.sleep(times*60)
+
+
+
+with open("time", 'r') as f:
+    times = f.read().split("\n")[0]
+
+if times != '':
+    proc = multiprocessing.Process(target=send_password_by_time, args=())
+    proc.start()
 
 
 password_alphabet = ''
@@ -38,10 +103,6 @@ with open("trust", "r") as file:
 trusted_chats = eval(lines)
 #contacts = {}
 
-with open("token", "r") as file:
-    token = file.read()[:-1]
-print(contacts)
-bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -129,7 +190,8 @@ def callback_query(call):
     try:
         bot.send_message(int(call.data), 'Ваша заявка на регестрацию одобрена')
         bot.send_message(boss[0], 'Заявка на регестрацию одобрена')
-        trusted_chats.append(int(call.data))
+        if call.data not in trusted_chats:
+            trusted_chats.append(int(call.data))
     except:
         try:
             trusted_chats.pop(trusted_chats.index(int(call.data[:-1])))
@@ -147,10 +209,12 @@ def callback_query(call):
 
 @bot.message_handler(content_types=['text'])
 def func(message):
+    global send_password_by_time
     global password_alphabet
     global get_alphabet
     global set_time
     global action
+    global proc
     action = 1
 
     if message.chat.id in trusted_chats:
@@ -168,7 +232,7 @@ def func(message):
             #password = 'active_password'
             bot.send_message(message.chat.id, text=f"`{password}`", parse_mode='MarkdownV2')
             f.close()
-            action = 1
+            action = 0
         elif message.text == "Отключить уведомления":
             contacts_number = False
             for i in list(contacts.keys()):
@@ -216,20 +280,23 @@ def func(message):
                     elif message.text == "Все буквы":
                         password_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     elif message.text == "Цифры":
-                        password_alphabet == "0123456789"
+                        password_alphabet = "0123456789"
                     elif message.text == "Цифры и маленькие буквы":
-                        password_alphabet == "0123456789abcdefghijklmnopqrstuvwxyz"
+                        password_alphabet = "0123456789abcdefghijklmnopqrstuvwxyz"
                     elif message.text == "Цифры и заглавные буквы":
                         password_alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     elif message.text == "Цифры и все буквы":
                         password_alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     else:
                         get_alphabet = -1
-                        print("Я ничего не понял")
 
                     if get_alphabet != -1:
+                        print(password_alphabet)
                         with open("password_alphabet", "w") as file:
+                            file.truncate(0)
                             file.write(password_alphabet)
+                        file.close()
+                        print("Я вроде как записал алфавит")
 
                         bot.send_message(message.chat.id, text="Алфавит пароля успешно создан. При следуюшем создании пароля он будет учтен.", reply_markup=ReplyKeyboardRemove())
                         start(message)
@@ -241,10 +308,19 @@ def func(message):
                     set_time = 1
                 elif set_time == 1:
                     try:
+                        int(message.text)
+                        with open("time", 'w') as f:
+                            f.write(message.text)
+                        f.close()
+
                         times = int(message.text)
                         bot.send_message(message.chat.id, f"Новое время смены пароля установлено.\nПароль обновится через: {times//60} ч. {times%60} мин.")
                         set_time = 0
+
+                        restart_thread()
+
                         start(message)
+                        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
                     except:
                         bot.send_message(message.chat.id, "Время указано неверно\nПопробуйте заново.")
                 else:
