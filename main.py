@@ -25,12 +25,6 @@ while True:
             token = file.read()[:-1]
         bot = telebot.TeleBot(token)
 
-        def restart_thread():
-            global proc
-            proc.terminate()
-            proc = multiprocessing.Process(target=send_password_by_time, args=())
-            proc.start()
-
         def bot_send_mess(i,password):
             global bot
             bot.send_message(i, text=f"`{password}`", parse_mode='MarkdownV2')
@@ -322,11 +316,9 @@ while True:
                             set_time = 0
 
                             #restart_thread()       it`s not working
-                            print(10)
-                            raise "Restart system"
-
-
                             start(message)
+                            proc.terminate()
+                            raise "Restart system"
                             print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
                         else:
