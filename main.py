@@ -188,6 +188,9 @@ while True:
                 bot.send_message(boss[0], 'Заявка на регестрацию одобрена')
                 if call.data not in trusted_chats:
                     trusted_chats.append(int(call.data))
+                    with open("trust", "w") as file:
+                        file.write(str(trusted_chats))
+                menu(message)
             except:
                 try:
                     trusted_chats.pop(trusted_chats.index(int(call.data[:-1])))
@@ -195,11 +198,11 @@ while True:
                     pass
                 bot.send_message(int(call.data[:-1]), 'Ваша заявка на регестрацию отклонена')
                 bot.send_message(boss[0], 'Заявка на регестрацию отклонена')
+                with open("trust", "w") as file:
+                    file.write(str(trusted_chats))
+                start(message)
 
             print(trusted_chats)
-
-            with open("trust", "w") as file:
-                    file.write(str(trusted_chats))
 
 
 
