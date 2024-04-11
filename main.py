@@ -8,14 +8,18 @@ from telebot import types
 from telebot.types import ReplyKeyboardRemove
 
 while True:
-    try:
+    #try:
+    if 1==1:
         global send_password_by_time
         global get_alphabet
         get_alphabet = 0
         global password_alphabet
+        global delete_user
         global set_time
+        global contacts
         set_time = 0
         global action
+        global trusted_chats
         action = 0
         global proc
         global bot
@@ -125,7 +129,7 @@ while True:
 
         @bot.message_handler(content_types=['contact'])
         def contact(message):
-
+            global contacts
             if message.contact is not None:
                 #print(message.contact)
                 #print(message.contact.first_name, message.contact.last_name, message.contact.user_id)
@@ -164,10 +168,11 @@ while True:
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
                 btn1 = types.KeyboardButton("Задать алфавит пароля")
                 btn2 = types.KeyboardButton("Задать время смены пароля")
-                markup.add(btn1, btn2)
+                btn3 = types.KeyboardButton("Управление пользователями")
+                markup.add(btn1, btn2, btn3)
                 bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
             else:
-                bot.send_message(message.chat.id, "У тебя недостаточно прав для этого")
+                bot.send_message(message.chat.id, "У вас недостаточно прав для этого действия")
 
 
         @bot.message_handler(commands=['menu'])
@@ -211,10 +216,15 @@ while True:
             global send_password_by_time
             global password_alphabet
             global get_alphabet
+            global delete_user
             global set_time
+            global contacts
             global action
+            global trusted_chats
             global proc
             action = 1
+
+
 
             if message.chat.id in trusted_chats:
                 if(message.text == "Активный пароль"):
@@ -243,7 +253,7 @@ while True:
                         print("Something went wrong")
 
                     try:
-                        trust.pop(index(message.chat.id))
+                        trusted_chats.pop(index(message.chat.id))
                     except:
                         pass
 
@@ -322,7 +332,51 @@ while True:
                             start(message)
                             proc.terminate()
                             raise "Restart system"
-                            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+                            # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+                        elif message.text == "Управление пользователями":
+                            markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+                            btn1 = types.KeyboardButton("Список пользователей")
+                            btn2 = types.KeyboardButton("Удалить пользователя")
+                            markup.add(btn1, btn2)
+                            bot.send_message(message.chat.id, text="Меню появилось", reply_markup=markup)
+
+                        elif message.text == "Список пользователей":
+                            print(contacts)
+                            phone_numbers = contacts.keys()
+                            datas = ''
+                            for i in phone_numbers:
+                                try:
+                                    datas+= i+" : "+contacts[i]["first_name"]+' '+contacts[i]["last_name"]+" : "+str(contacts[i]["user_id"])+'\n'
+                                except:
+                                    datas+= i+" : "+contacts[i]["first_name"]+" : "+str(contacts[i]["user_id"])+'\n'
+                            bot.send_message(message.chat.id, datas)
+                            admin_menu(message)
+                        elif message.text == "Удалить пользователя":
+                            delete_user = 1
+                            bot.send_message(message.chat.id, "Введите номер телефона или id пользователя")
+                        elif delete_user == 1:
+                            delete_user = 0
+                            data_for_delete = message.text
+                            try:
+                                if data_for_delete.index("+") != -1:
+                                    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+                                    print(contacts[data_for_delete.split('+')[1]]["user_id"], trusted_chats)
+                                    trusted_chats.pop(trusted_chats.index(contacts[data_for_delete.split('+')[1]]["user_id"]))
+                                    contacts.pop(data_for_delete.split('+')[1])
+                                    bot.send_message(message.chat.id, "Пользователь удалён")
+                                    admin_menu(message)
+                            except:
+                                # write some code
+
+                            #print(contacts)
+                            #print(trusted_chats)
+                            with open("contacts", "w") as file:
+                                file.write(str(contacts))
+
+                            with open("trust", "w") as file:
+                                file.write(str(trusted_chats))
+
 
                         else:
                             bot.send_message(message.chat.id, "Извините, я не понимаю. Для меню нажмите на /start")
@@ -335,5 +389,5 @@ while True:
                 bot.send_message(message.chat.id, text="Пожалуйста зарегестрируйтесь\n/register")
 
         bot.polling()
-    except:
-        print("Restarted the system")
+    #except:
+    #    print("Restarted the system")
