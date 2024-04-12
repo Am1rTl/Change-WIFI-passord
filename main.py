@@ -156,7 +156,7 @@ while True:
                 with open("contacts", "w") as file:
                     file.write(str(contacts))
 
-                bot.send_message(message.chat.id, "Thanks you for your phone number \n /start", reply_markup=ReplyKeyboardRemove())
+                bot.send_message(message.chat.id, "Пользуясь данным продуктом вы соглашаетесь с https://clck.ru/3A3qa5 \n /start", reply_markup=ReplyKeyboardRemove())
 
         @bot.message_handler(commands=['info'])
         def info(message):
