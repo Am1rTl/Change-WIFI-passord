@@ -148,9 +148,9 @@ while True:
                 markup.add(button1)
                 markup.add(button2)
                 if message.from_user.last_name != None:
-                    bot.send_message(boss[0], text=f"Регестрация нового пользователя c: \nИменем: `{message.from_user.first_name} {message.from_user.last_name}`\nНиком: `{message.from_user.username}` \nТелефоном: `{message.contact.phone_number}` ", parse_mode='MarkdownV2', reply_markup=markup)
+                    bot.send_message(boss[0], text=f"Регистрация нового пользователя c: \nИменем: ||{message.from_user.first_name} {message.from_user.last_name}||\nНиком: ||{message.from_user.username}|| \nТелефоном: ||{message.contact.phone_number}|| ", parse_mode='MarkdownV2', reply_markup=markup)
                 else:
-                    bot.send_message(boss[0], text=f"Регестрация нового пользователя c: \nИменем: `{message.from_user.first_name}`\nНиком: `{message.from_user.username}` \nТелефоном: `{message.contact.phone_number}` ", parse_mode='MarkdownV2', reply_markup=markup)
+                    bot.send_message(boss[0], text=f"Регистрация нового пользователя c: \nИменем: ||{message.from_user.first_name}||\nНиком: ||{message.from_user.username}|| \nТелефоном: ||{message.contact.phone_number}|| ", parse_mode='MarkdownV2', reply_markup=markup)
 
 
                 with open("contacts", "w") as file:
