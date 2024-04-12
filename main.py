@@ -359,7 +359,7 @@ while True:
                             delete_user = 0
                             data_for_delete = message.text
                             try:
-                                if data_for_delete.index("+") != -1:
+                                if data_for_delete.find("+") != -1:
                                     print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
                                     print(contacts[data_for_delete.split('+')[1]]["user_id"], trusted_chats)
                                     trusted_chats.pop(trusted_chats.index(contacts[data_for_delete.split('+')[1]]["user_id"]))
@@ -367,7 +367,13 @@ while True:
                                     bot.send_message(message.chat.id, "Пользователь удалён")
                                     admin_menu(message)
                             except:
-                                # write some code
+                                if contacts.find(data_for_delete) != -1:
+                                    if contacts.keys().index(data_for_delete) != -1:
+                                        trusted_chats.pop(trusted_chats.index(contacts[data_for_delete]["user_id"]))
+                                        contacts.pop(data_for_delete)
+                                    # Надо доделать
+                                else:
+                                    bot.send_message(message.chat.id, "По введённым данным ничего не найдено")
 
                             #print(contacts)
                             #print(trusted_chats)
