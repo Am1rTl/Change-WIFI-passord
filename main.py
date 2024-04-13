@@ -8,8 +8,8 @@ from telebot import types
 from telebot.types import ReplyKeyboardRemove
 
 while True:
-    #try:
-    if 1==1:
+    try:
+    #if 1==1:
         global send_password_by_time
         global get_alphabet
         get_alphabet = 0
@@ -130,6 +130,7 @@ while True:
         @bot.message_handler(content_types=['contact'])
         def contact(message):
             global contacts
+            global trusted_chats
             if message.contact is not None:
                 #print(message.contact)
                 #print(message.contact.first_name, message.contact.last_name, message.contact.user_id)
@@ -148,9 +149,9 @@ while True:
                 markup.add(button1)
                 markup.add(button2)
                 if message.from_user.last_name != None:
-                    bot.send_message(boss[0], text=f"Регистрация нового пользователя c: \nИменем: ||{message.from_user.first_name} {message.from_user.last_name}||\nНиком: ||{message.from_user.username}|| \nТелефоном: ||{message.contact.phone_number}|| ", parse_mode='MarkdownV2', reply_markup=markup)
+                    bot.send_message(boss[0], text=f"Регестрация нового пользователя c: \nИменем: `{message.from_user.first_name} {message.from_user.last_name}`\nНиком: `{message.from_user.username}` \nТелефоном: `{message.contact.phone_number}` ", parse_mode='MarkdownV2', reply_markup=markup)
                 else:
-                    bot.send_message(boss[0], text=f"Регистрация нового пользователя c: \nИменем: ||{message.from_user.first_name}||\nНиком: ||{message.from_user.username}|| \nТелефоном: ||{message.contact.phone_number}|| ", parse_mode='MarkdownV2', reply_markup=markup)
+                    bot.send_message(boss[0], text=f"Регестрация нового пользователя c: \nИменем: `{message.from_user.first_name}`\nНиком: `{message.from_user.username}` \nТелефоном: ||{message.contact.phone_number}|| ", parse_mode='MarkdownV2', reply_markup=markup)
 
 
                 with open("contacts", "w") as file:
@@ -380,8 +381,7 @@ while True:
                             with open("contacts", "w") as file:
                                 file.write(str(contacts))
 
-                            with open("trust", "w") as file:
-                                file.write(str(trusted_chats))
+
 
 
                         else:
@@ -395,5 +395,5 @@ while True:
                 bot.send_message(message.chat.id, text="Пожалуйста зарегестрируйтесь\n/register")
 
         bot.polling()
-    #except:
-    #    print("Restarted the system")
+    except:
+        print("Restarted the system")
